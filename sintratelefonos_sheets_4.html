@@ -87,10 +87,6 @@
 
   .fecha-note { font-size: 11px; color: var(--text-faint); margin-top: 1rem; text-align: right; font-style: italic; }
 
-  #api-config-banner { background: #EBF5FB; border: 1px solid #AED6F1; border-radius: var(--radius); padding: 12px 14px; margin-bottom: 1.5rem; font-size: 13px; color: #1A5276; }
-  #api-config-banner strong { display: block; margin-bottom: 4px; }
-  #api-config-banner input { margin-top: 8px; font-size: 12px; font-family: monospace; color: #1A5276; border-color: #AED6F1; height: 36px; }
-
   footer { text-align: center; padding: 1.5rem; font-size: 12px; color: var(--text-faint); border-top: 1px solid var(--border); background: var(--surface); }
 
   @media (max-width: 520px) {
@@ -122,17 +118,10 @@
       <p>Ingrese su ID para verificar y actualizar su información</p>
     </div>
     <div class="card-body">
-
-      <div id="api-config-banner">
-        <strong>⚙ Configuración requerida</strong>
-        Pegue la URL del Web App de Google Apps Script y presione Enter.
-        <input type="text" id="api-url-input" placeholder="https://script.google.com/macros/s/XXXX/exec" />
-      </div>
-
       <div class="search-wrap">
         <div class="field">
           <label for="id-input">ID Afiliado</label>
-          <input type="text" id="id-input" placeholder="Código ETB de 5 dígitos" autocomplete="off" />
+          <input type="text" id="id-input" placeholder="Ej: AF-001" autocomplete="off" />
         </div>
         <button class="btn btn-primary" id="btn-buscar" onclick="buscarAfiliado()">
           <span id="spinner-buscar" class="spinner"></span>
@@ -208,22 +197,9 @@
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────
-var API_URL = localStorage.getItem("sintra_api_url") || "";
+var API_URL = "https://script.google.com/macros/s/AKfycbxqLKs0twBMoVu0Zbcq8bQqVuh750ZELNaG-tHDbcwjO_Fvh7CEk3j4vI6mGuhcJF_uwQ/exec";
 
 document.addEventListener("DOMContentLoaded", function() {
-  if (API_URL) {
-    document.getElementById("api-url-input").value = API_URL;
-    document.getElementById("api-config-banner").style.display = "none";
-  }
-  document.getElementById("api-url-input").addEventListener("change", function() {
-    var url = this.value.trim();
-    if (url) {
-      API_URL = url;
-      localStorage.setItem("sintra_api_url", url);
-      document.getElementById("api-config-banner").style.display = "none";
-      showToast("URL guardada correctamente", false);
-    }
-  });
   document.getElementById("id-input").addEventListener("keydown", function(e) {
     if (e.key === "Enter") buscarAfiliado();
   });
@@ -252,8 +228,6 @@ function callScript(payloadObj) {
 function buscarAfiliado() {
   var idVal = document.getElementById("id-input").value.trim();
   if (!idVal) { showError("Ingrese un ID antes de consultar."); return; }
-  if (!API_URL) { showError("Configure primero la URL del Apps Script arriba."); document.getElementById("api-config-banner").style.display = "block"; return; }
-
   setLoading("buscar", true);
   document.getElementById("error-msg").style.display = "none";
   document.getElementById("result-section").style.display = "none";
@@ -309,8 +283,6 @@ function setReadonly(ro) {
 
 // ── GUARDAR ───────────────────────────────────────────────────
 function guardarCambios() {
-  if (!API_URL) { showError("Configure primero la URL del Apps Script."); return; }
-
   var payload = {
     action:    "guardar",
     id:        currentAfiliado.id,
